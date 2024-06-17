@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
@@ -28,6 +30,17 @@ class Category
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, Adsense>
+     */
+    #[ORM\ManyToMany(targetEntity: Adsense::class, mappedBy: 'categories')]
+    private Collection $adsenses;
+
+    public function __construct()
+    {
+        $this->adsenses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +103,33 @@ class Category
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Adsense>
+     */
+    public function getAdsenses(): Collection
+    {
+        return $this->adsenses;
+    }
+
+    public function addAdsense(Adsense $adsense): static
+    {
+        if (!$this->adsenses->contains($adsense)) {
+            $this->adsenses->add($adsense);
+            $adsense->addCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdsense(Adsense $adsense): static
+    {
+        if ($this->adsenses->removeElement($adsense)) {
+            $adsense->removeCategory($this);
+        }
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,6 +48,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, Adsense>
+     */
+    #[ORM\OneToMany(targetEntity: Adsense::class, mappedBy: 'owner')]
+    private Collection $adsenses;
+
+    public function __construct()
+    {
+        $this->adsenses = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -179,6 +192,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Adsense>
+     */
+    public function getAdsenses(): Collection
+    {
+        return $this->adsenses;
+    }
+
+    public function addAdsense(Adsense $adsense): static
+    {
+        if (!$this->adsenses->contains($adsense)) {
+            $this->adsenses->add($adsense);
+            $adsense->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdsense(Adsense $adsense): static
+    {
+        if ($this->adsenses->removeElement($adsense)) {
+            // set the owning side to null (unless already changed)
+            if ($adsense->getOwner() === $this) {
+                $adsense->setOwner(null);
+            }
+        }
 
         return $this;
     }
