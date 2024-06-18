@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/manager/categories', name: 'categories_')]
+#[Route('/manager/categories', name: 'category_')]
 class CategoryController extends AbstractController
 {
     #[Route('/', name: 'index', methods: ['GET'])]
@@ -30,10 +30,13 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $category->setCreatedAt();
+            $category->setUpdatedAt();
+
             $entityManager->persist($category);
             $entityManager->flush();
 
-            return $this->redirectToRoute('index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('category_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('category/new.html.twig', [
@@ -57,9 +60,11 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $category->setUpdatedAt();
+
             $entityManager->flush();
 
-            return $this->redirectToRoute('index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('category_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('category/edit.html.twig', [
@@ -76,6 +81,6 @@ class CategoryController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('category_index', [], Response::HTTP_SEE_OTHER);
     }
 }

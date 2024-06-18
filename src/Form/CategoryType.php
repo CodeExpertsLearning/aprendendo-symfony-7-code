@@ -15,12 +15,12 @@ class CategoryType extends AbstractType
             ->add('name')
             ->add('description')
             ->add('slug')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
+            // ->add('createdAt', null, [
+            //     'widget' => 'single_text',
+            // ])
+            // ->add('updatedAt', null, [
+            //     'widget' => 'single_text',
+            // ])
         ;
     }
 

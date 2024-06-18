@@ -3,66 +3,84 @@
 namespace App\Controller;
 
 use App\Entity\Adsense;
+use App\Form\AdsenseType;
 use App\Repository\AdsenseRepository;
-use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/manager/adsenses', name: 'adsenses_')]
+#[Route('/manager/adsenses', name: 'adsense_')]
 class AdsenseController extends AbstractController
 {
-    #[Route('/', name: 'index')]
-    public function index(AdsenseRepository $adsRepository): Response
+    #[Route('/', name: 'index', methods: ['GET'])]
+    public function index(AdsenseRepository $adsenseRepository): Response
     {
-        $adsenses = $adsRepository->findAll();
-
-        return $this->render('adsense/index.html.twig', compact('adsenses'));
+        return $this->render('adsense/index.html.twig', [
+            'adsenses' => $adsenseRepository->findAll(),
+        ]);
     }
 
-    #[Route('/{slug}', name: 'edit')]
-    public function edit(AdsenseRepository $adsRepository, string $slug): Response
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $ads = $adsRepository->findOneBySlug($slug);
+        $adsense = new Adsense();
+        $form = $this->createForm(AdsenseType::class, $adsense);
+        $form->handleRequest($request);
 
-        if (!$ads) throw $this->createNotFoundException('Anúncio não encontrado!');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $adsense->setCreatedAt();
+            $adsense->setUpdatedAt();
 
-        return $this->render('adsense/edit.html.twig', compact('ads'));
+            $entityManager->persist($adsense);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('adsense/new.html.twig', [
+            'adsense' => $adsense,
+            'form' => $form,
+        ]);
     }
 
-    #[Route('/test', name: 'test')]
-    public function test(EntityManagerInterface $manager, AdsenseRepository $repo): Response
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(Adsense $adsense): Response
     {
-        //Inserção com Doctrine
+        return $this->render('adsense/show.html.twig', [
+            'adsense' => $adsense,
+        ]);
+    }
 
-        // $tmz = new DateTimeZone('America/Sao_Paulo');
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Adsense $adsense, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(AdsenseType::class, $adsense);
+        $form->handleRequest($request);
 
-        // $ads = new Adsense();
-        // $ads->setTitle('Titulo Teste');
-        // $ads->setDescription('Descrição Anúncio');
-        // $ads->setBody('Conteúdo anúncio');
-        // $ads->setSlug('titulo-teste');
-        // $ads->setCreatedAt(new \DateTimeImmutable('now', $tmz));
-        // $ads->setUpdatedAt(new \DateTimeImmutable('now', $tmz));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $adsense->setUpdatedAt();
 
-        // $manager->persist($ads);
-        // $manager->flush();
+            $entityManager->flush();
 
+            return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
+        }
 
-        //Atualizando dados...
-        // $ads = $repo->findOneBySlug('titulo-teste');
+        return $this->render('adsense/edit.html.twig', [
+            'adsense' => $adsense,
+            'form' => $form,
+        ]);
+    }
 
-        // $ads->setTitle('Titulo Teste Editado');
+    #[Route('/{id}', name: 'delete', methods: ['POST'])]
+    public function delete(Request $request, Adsense $adsense, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $adsense->getId(), $request->getPayload()->get('_token'))) {
+            $entityManager->remove($adsense);
+            $entityManager->flush();
+        }
 
-        // $manager->flush();
-
-        //Removendo dados...
-        // $ads = $repo->findOneBySlug('titulo-teste');
-
-        // $manager->remove($ads);
-        // $manager->flush();
-
-        return new Response('Teste...');
+        return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
     }
 }

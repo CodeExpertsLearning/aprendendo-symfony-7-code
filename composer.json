@@ -16,6 +16,7 @@
         "symfony/flex": "^2",
         "symfony/form": "7.1.*",
         "symfony/framework-bundle": "7.1.*",
+        "symfony/monolog-bundle": "^3.0",
         "symfony/runtime": "7.1.*",
         "symfony/security-bundle": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
@@ -25,7 +26,10 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.59"
+        "symfony/debug-bundle": "7.1.*",
+        "symfony/maker-bundle": "^1.59",
+        "symfony/stopwatch": "7.1.*",
+        "symfony/web-profiler-bundle": "7.1.*"
     },
     "config": {
         "allow-plugins": {
