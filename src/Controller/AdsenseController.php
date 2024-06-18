@@ -36,7 +36,7 @@ class AdsenseController extends AbstractController
             $entityManager->persist($adsense);
             $entityManager->flush();
 
-            return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('adsense_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('adsense/new.html.twig', [
@@ -64,7 +64,7 @@ class AdsenseController extends AbstractController
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('adsense_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('adsense/edit.html.twig', [
@@ -81,6 +81,6 @@ class AdsenseController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('adsenses_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('adsense_index', [], Response::HTTP_SEE_OTHER);
     }
 }
